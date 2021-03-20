@@ -4,12 +4,14 @@
 struct String{
 	char *cstr;
 	unsigned len;
+	unsigned memlen;
 };
 
 String new_string(char const *cstr){
 	String tmp;
 	tmp.len = strlen(cstr);
-	tmp.cstr = new char[tmp.len + 1];
+	tmp.memlen = tmp.len * 2 + 1;
+	tmp.cstr = new char[tmp.memlen];
 	strcpy(tmp.cstr, cstr);
 	return tmp;
 }
@@ -17,15 +19,17 @@ String new_string(char const *cstr){
 String new_string(){
 	String tmp;
 	tmp.len = 0;
-	tmp.cstr = new char[1];
+	tmp.cstr = new char[2];
 	tmp.cstr[0] = 0;
+	tmp.memlen = 2;
 	return tmp;
 }
 
 String new_string(String const &src){
 	String tmp;
 	tmp.len = src.len;
-	tmp.cstr = new char[tmp.len + 1];
+	tmp.memlen = tmp.len*2 + 1;
+	tmp.cstr = new char[tmp.memlen];
 	for (int i = 0; i < tmp.len + 1; i++){
 		tmp.cstr[i] = src.cstr[i];
 	}
@@ -43,7 +47,8 @@ unsigned length(String const &str){
 String& copy(String &dst, String const &src){
 	dst.len = length(src);
 	delete_string(dst);
-	dst.cstr = new char[dst.len + 1];
+	dst.memlen = dst.len *2 +1;
+	dst.cstr = new char[dst.memlen];
 	for (int i=0;i<=dst.len;i++){
 		dst.cstr[i] = src.cstr[i];
 	}
@@ -60,22 +65,31 @@ String& set_char_at(String &str, unsigned pos, char c){
 }
 
 String& append(String &dst, String const &src){
-	char* tmp = new char[dst.len + src.len + 1];
-	for (int i = 0;i < dst.len;i++){
-		tmp[i] = dst.cstr[i];
+	if (dst.memlen > dst.len + src.len){
+		for (int i = 0; i <= src.len; i++){
+			dst.cstr[i + dst.len] = src.cstr[i];
+		}
+		dst.len = dst.len + src.len;
+	}else{
+		char* tmp = new char[(dst.len + src.len)*2 +1];
+		for (int i = 0;i < dst.len;i++){
+			tmp[i] = dst.cstr[i];
+		}
+		for (int i = 0;i <=src.len;i++){
+			tmp[i + dst.len] = src.cstr[i];
+		}
+		dst.memlen = (dst.len + src.len)*2 +1;
+		dst.len = dst.len + src.len;
+		delete_string(dst);
+		dst.cstr = tmp;
 	}
-	for (int i = 0;i <=src.len;i++){
-		tmp[i + dst.len] = src.cstr[i];
-	}
-	dst.len = dst.len + src.len;
-	delete_string(dst);
-	dst.cstr = tmp;
 	return dst;
 }
 
 String& append(String &dst, char const *cstr){
 	String tmp = new_string(cstr);
 	dst = append(dst, tmp);
+	delete_string(tmp);
 	return dst;
 }
 
@@ -86,12 +100,14 @@ void print(String const &str){
 }
 
 int main(){
-	String some_shit = new_string("hello world");
-	String some_shit_2 = new_string();
-	String some_shit_3 = new_string(some_shit);
-	String some_shit_4 = new_string("ababababa");
-	String a = append(some_shit_4, "hahahaha");
-	print(a);
+	String str;
+	String cpy;
+	cpy = new_string();
+	str = new_string("abababab");
+	copy(cpy, str);
+	append(cpy, str);
+	append(cpy, "vvvvvvvv");
+	print(cpy);
 	return 0;
 }
 
