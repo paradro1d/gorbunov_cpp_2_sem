@@ -24,13 +24,13 @@ k_list = (sum(x.*y.*weighs)*sum(weighs) - sum(x.*weighs)*sum(y.*weighs))/(sum(x.
 b_list = sum(y.*weighs)/sum(weighs) - k_list*sum(x.*weighs)/sum(weighs);
 dk = 0;
 db = 0;
-while (sum((y - ((k_list + dk)*x + b_list)).^2.*weighs)/20 - sum((y - (k_list*x + b_list)).^2.*weighs)/20 < 1)
+while (sum((y - ((k_list + dk)*x + b_list)).^2.*weighs) - sum((y - (k_list*x + b_list)).^2.*weighs) < 1)
     dk = dk + 0.001;
 end
-while (sum((y - (k_list*x + b_list + db)).^2.*weighs)/20 - sum((y - (k_list*x + b_list)).^2.*weighs)/20 < 1)
+while (sum((y - (k_list*x + b_list + db)).^2.*weighs) - sum((y - (k_list*x + b_list)).^2.*weighs) < 1)
     db = db + 0.001;
 end
-chi = sum((y - (k_list*x + b_list)).^2.*weighs)/20;
+chi = sum((y - (k_list*x + b_list)).^2.*weighs);
 hold on;
 errorbar(x, y, error, '.');
 y = k_list*x + b_list;
